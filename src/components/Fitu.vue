@@ -73,7 +73,7 @@
     </v-card>
     <p class="title ml-14 mt-12 teal--text text--darken-4">Pets</p>
 
-    <v-card class="mx-auto" width="90%" outlined>
+    <v-card class="mx-auto" width="100%" outlined>
       <v-data-table
         :headers="headers"
         :items="pets"
@@ -81,7 +81,7 @@
         hide-default-footer
         locale="en"
       >
-      <!--eslint-disable-->
+        <!--eslint-disable-->
         <template v-slot:item.acciones="{ item }">
           <!--eslint-disable-->
           <v-icon small class="mr-2" @click="editItem(item)">
@@ -89,6 +89,15 @@
           </v-icon>
           <v-icon small @click="deletePet(item)"> mdi-delete </v-icon>
         </template>
+        <template v-slot:item.color="{ item }">
+      <v-avatar
+        :color="getColor(item.color)"
+        dark
+        size="15"
+      >
+        
+      </v-avatar>
+    </template>
       </v-data-table>
     </v-card>
 
@@ -100,18 +109,14 @@
           >
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text 
-              >Cancel</v-btn
-            >
-            <v-btn color="blue darken-1" text 
-              >OK</v-btn
-            >
+            <v-btn color="blue darken-1" text>Cancel</v-btn>
+            <v-btn color="blue darken-1" text>OK</v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
       </v-dialog>
 
-      <div class="text-center">
+      <div class="text-center" v-if="formAgregar">
         <v-row justify="center">
           <v-dialog
             scrollable
@@ -120,7 +125,7 @@
             persistent
           >
             <v-card hover light max-height="500">
-              <v-card-title class="headline teal accent-4">
+              <v-card-title class="headline success">
                 Create a Pet
               </v-card-title>
 
@@ -183,15 +188,88 @@
                   color="error"
                   elevation="24"
                   @click="dialogCreatePet = false"
-                  outlined
-                  >Cancelar</v-btn
+                  >Cancel</v-btn
                 >
-                <v-btn
-                  color="success"
-                  @click="createPet()"
-                  elevation="24"
-                  outlined
-                  >Crear</v-btn
+                <v-btn color="success" @click="createPet()" elevation="24"
+                  >Create</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-row>
+      </div>
+
+      <div class="text-center" v-if="!formAgregar">
+        <v-row justify="center">
+          <v-dialog
+            scrollable
+            v-model="dialogCreatePet"
+            width="500px"
+            persistent
+          >
+            <v-card hover light max-height="500">
+              <v-card-title class="headline warning"> Edit a Pet </v-card-title>
+
+              <v-card-text>
+                <v-form ref="form" lazy-validation>
+                  <v-text-field
+                    append-icon="mdi-paw"
+                    v-model="name"
+                    label="Name:"
+                    required
+                  ></v-text-field>
+                  <v-select
+                    v-model="kind"
+                    :items="kinds"
+                    append-icon="mdi-paw"
+                    menu-props="auto"
+                    hide-details
+                    label="Type:"
+                    single-line
+                  ></v-select>
+
+                  <v-text-field
+                    append-icon="mdi-paw"
+                    v-model="breed"
+                    label="Breed:"
+                    required
+                  ></v-text-field>
+                  <v-text-field
+                    append-icon="mdi-calendar-check"
+                    v-model="age"
+                    label="Age:"
+                    required
+                    type="number"
+                  ></v-text-field>
+
+                  <v-select
+                    v-model="gender"
+                    :items="genders"
+                    append-icon="mdi-gender-male-female"
+                    menu-props="auto"
+                    hide-details
+                    label="Gender:"
+                    single-line
+                  ></v-select>
+
+                  <v-text-field
+                    append-icon="mdi-palette"
+                    v-model="color"
+                    label="Color:"
+                    required
+                  ></v-text-field>
+                </v-form>
+              </v-card-text>
+              <v-divider></v-divider>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn color="error" elevation="24" @click="cancelarEdit()"
+                  >Cancel</v-btn
+                >
+                <v-btn color="warning" @click="editarFinal()" elevation="24"
+                  >Edit</v-btn
                 >
               </v-card-actions>
             </v-card>
@@ -208,6 +286,8 @@ export default {
   name: "Fitu",
   data() {
     return {
+      itemEdit: "",
+      formAgregar: true,
       name: "",
       kind: "",
       breed: "",
@@ -287,6 +367,11 @@ export default {
     };
   },
   methods: {
+
+
+    getColor (color) {
+     return color;
+      },
     getPets() {
       const params = new URLSearchParams([
         ["token", "7b64d09060db17ca6b96c0af99575903"],
@@ -295,7 +380,9 @@ export default {
         .get("http://api-pets.fituapp.com/api/v1/pets", { params })
         .then((result) => {
           console.log(result);
+          this.getColor();
           this.pets = result.data;
+          console.log(result.data[0].color);
           //result.data.forEach(element => {
           //console.log(element.created_at);
           //let arrayFecha= element.created_at.split(['-'])
@@ -361,10 +448,62 @@ export default {
     cancelar() {
       this.dialogCreatePet = false;
     },
+    cancelarEdit() {
+      this.dialogCreatePet = false;
+      this.formAgregar = true;
+    },
     cancelarEliminar() {
-      this.dialogDelete=false;
-     // this.yesornoDelete=false;
-    }
+      this.dialogDelete = false;
+      // this.yesornoDelete=false;
+    },
+    editItem(item) {
+      this.formAgregar = false;
+      this.addPet();
+      console.log(item);
+      this.name = item.name;
+      this.kind = item.kind;
+      this.breed = item.breed;
+      this.age = item.age;
+      this.gender = item.gender;
+      this.color = item.color;
+      this.itemEdit = item;
+      console.log(this.itemEdit);
+    },
+    editarFinal() {
+      console.log(this.itemEdit.id);
+      this.itemEdit.name = this.name;
+      this.itemEdit.kind = this.kind;
+      this.itemEdit.breed = this.breed;
+      this.itemEdit.age = this.age;
+      this.itemEdit.gender = this.gender;
+      this.itemEdit.color = this.color;
+      console.log(this.itemEdit.name);
+      console.log(this.name);
+      const params = new URLSearchParams([
+        ["token", "7b64d09060db17ca6b96c0af99575903"],
+      ]);
+
+      let editPet = {
+        name: this.name,
+        kind: this.kind,
+        breed: this.breed,
+        age: this.age,
+        gender: this.gender,
+        color: this.color,
+      };
+      axios
+        .put(
+          `http://api-pets.fituapp.com/api/v1/pets/${this.itemEdit.id}`,
+          editPet,
+          { params }
+        )
+        .then((result) => {
+          console.log(result);
+          this.formAgregar = true;
+          this.cancelar();
+          this.getPets();
+        });
+    },
   },
   watch: {},
   created() {
