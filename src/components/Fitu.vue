@@ -87,7 +87,7 @@
           <v-icon small class="mr-2" @click="editItem(item)">
             mdi-pencil
           </v-icon>
-          <v-icon small @click="deletePet(item)"> mdi-delete </v-icon>
+          <v-icon small @click="accionaEliminar(item)"> mdi-delete </v-icon>
         </template>
         <template v-slot:item.color="{ item }">
           <v-avatar :color="getColor(item.color)" dark size="15"> </v-avatar>
@@ -96,19 +96,7 @@
     </v-card>
 
     <v-main>
-      <v-dialog v-model="dialogDelete" max-width="500px">
-        <v-card>
-          <v-card-title class="headline"
-            >Are you sure you want to delete this item?</v-card-title
-          >
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text>Cancel</v-btn>
-            <v-btn color="blue darken-1" text>OK</v-btn>
-            <v-spacer></v-spacer>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+
 
       <div class="text-center" v-if="formAgregar">
         <v-row justify="center">
@@ -301,6 +289,19 @@
           </v-dialog>
         </v-row>
       </div>
+            <v-dialog v-model="dialogDelete" max-width="500px">
+        <v-card color="orange darken-4">
+          <v-card-title class="headline black--text"
+            >Are you sure you want to delete this Pet?</v-card-title
+          >
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="warning" @click="dialogDelete=false">Cancel</v-btn>
+            <v-btn color="error" @click="deletePet()">Delete</v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-main>
   </v-app>
 </template>
@@ -312,6 +313,7 @@ export default {
   data() {
     return {
       itemEdit: "",
+      itemEliminar: "",
       formAgregar: true,
       name: "",
       kind: "",
@@ -428,19 +430,30 @@ export default {
       //});
     },
 
-    deletePet(item) {
-      console.log(item.id);
+    accionaEliminar(item){
+        this.itemEliminar=item.id;
+        console.log(this.itemEliminar);
+        this.dialogDelete=true;
+
+    },
+
+      deletePet() {
+      //console.log(item.id);
+
+      
+      
       //this.dialogDelete=true;
       const params = new URLSearchParams([
         ["token", "7b64d09060db17ca6b96c0af99575903"],
       ]);
       axios
-        .delete(`http://api-pets.fituapp.com/api/v1/pets/${item.id}`, {
+        .delete(`http://api-pets.fituapp.com/api/v1/pets/${this.itemEliminar}`, {
           params,
         })
         .then((result) => {
           this.getPets();
           console.log(result);
+          this.dialogDelete=false;
           //this.pets = result.data;
           // console.log(result.data[0]);
         });
