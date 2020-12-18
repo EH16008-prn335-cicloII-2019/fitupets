@@ -90,14 +90,8 @@
           <v-icon small @click="deletePet(item)"> mdi-delete </v-icon>
         </template>
         <template v-slot:item.color="{ item }">
-      <v-avatar
-        :color="getColor(item.color)"
-        dark
-        size="15"
-      >
-        
-      </v-avatar>
-    </template>
+          <v-avatar :color="getColor(item.color)" dark size="15"> </v-avatar>
+        </template>
       </v-data-table>
     </v-card>
 
@@ -171,12 +165,31 @@
                     single-line
                   ></v-select>
 
+                  <!--
                   <v-text-field
                     append-icon="mdi-palette"
                     v-model="color"
                     label="Color:"
                     required
                   ></v-text-field>
+                  -->
+
+                  <div class="text-center">
+                    <v-col>
+                      <v-chip class="ma-2" color="success">
+                        <v-icon left> mdi-palette</v-icon>
+                        Pick a Color:
+                          </v-chip>
+
+                      <v-color-picker
+                        append-icon="mdi-palette"
+                        dot-size="27"
+                        v-model="color"
+                        required
+                        mode="hexa"
+                      ></v-color-picker>
+                    </v-col>
+                  </div>
                 </v-form>
               </v-card-text>
               <v-divider></v-divider>
@@ -252,12 +265,24 @@
                     single-line
                   ></v-select>
 
-                  <v-text-field
-                    append-icon="mdi-palette"
-                    v-model="color"
-                    label="Color:"
-                    required
-                  ></v-text-field>
+
+                      <div class="text-center">
+                    <v-col>
+                      <v-chip class="ma-2" color="success">
+                        <v-icon left> mdi-palette</v-icon>
+                        Pick a Color:
+                          </v-chip>
+
+                      <v-color-picker
+                        append-icon="mdi-palette"
+                        dot-size="27"
+                        v-model="color"
+                        required
+                        mode="hexa"
+                      ></v-color-picker>
+                    </v-col>
+                  </div>
+
                 </v-form>
               </v-card-text>
               <v-divider></v-divider>
@@ -367,11 +392,9 @@ export default {
     };
   },
   methods: {
-
-
-    getColor (color) {
-     return color;
-      },
+    getColor(color) {
+      return color;
+    },
     getPets() {
       const params = new URLSearchParams([
         ["token", "7b64d09060db17ca6b96c0af99575903"],
