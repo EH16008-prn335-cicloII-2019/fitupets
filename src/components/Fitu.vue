@@ -113,8 +113,7 @@
                 <v-form
                   ref="form"
                   v-model="valid"
-                  lazy-validation
-                  
+                 
                 >
                   <v-text-field
                     append-icon="mdi-paw"
@@ -133,6 +132,7 @@
                     hide-details
                     label="Type:"
                     single-line
+                    :rules="[v => !!v || 'Type is required']"
                   ></v-select>
 
                   <v-text-field
@@ -150,6 +150,7 @@
                     required
                     type="number"
                     min="0"
+                    :rules="ageRules"
                   ></v-text-field>
 
                   <v-select
@@ -161,17 +162,11 @@
                     label="Gender:"
                     single-line
                     required
+                    :rules="[v => !!v || 'Gender is required']"
                   ></v-select>
 
-                  <!--
-                  <v-text-field
-                    append-icon="mdi-palette"
-                    v-model="color"
-                    label="Color:"
-                    required
-                  ></v-text-field>
-                  -->
 
+                  
                   <div class="text-center">
                     <v-col>
                       <v-chip class="ma-2" color="success">
@@ -188,6 +183,7 @@
                       ></v-color-picker>
                     </v-col>
                   </div>
+                  
                 </v-form>
               </v-card-text>
               <v-divider></v-divider>
@@ -198,10 +194,11 @@
                 <v-btn
                   color="error"
                   elevation="24"
+                  
                   @click="dialogCreatePet = false"
                   >Cancel</v-btn
                 >
-                <v-btn color="success" @click="createPet()" elevation="24"
+                <v-btn color="success" :disabled="!valid" @click="createPet()" elevation="24"
                   >Create</v-btn
                 >
               </v-card-actions>
@@ -222,8 +219,8 @@
               <v-card-title class="headline warning"> Edit a Pet </v-card-title>
 
               <v-card-text>
-                <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-text-field
+                <v-form ref="form" v-model="validEdit" >
+                <v-text-field
                     append-icon="mdi-paw"
                     v-model="name"
                     label="Name:"
@@ -236,10 +233,11 @@
                     :items="kinds"
                     append-icon="mdi-paw"
                     menu-props="auto"
+                    required
                     hide-details
                     label="Type:"
-                    required
                     single-line
+                    :rules="[v => !!v || 'Type is required']"
                   ></v-select>
 
                   <v-text-field
@@ -257,7 +255,9 @@
                     required
                     type="number"
                     min="0"
+                    :rules="[v => !!v || 'Gender is required']"
                   ></v-text-field>
+
                   <v-select
                     v-model="gender"
                     :items="genders"
@@ -267,8 +267,11 @@
                     label="Gender:"
                     single-line
                     required
+                    :rules="[v => !!v || 'Gender is required']"
                   ></v-select>
 
+
+                  
                   <div class="text-center">
                     <v-col>
                       <v-chip class="ma-2" color="success">
@@ -295,7 +298,7 @@
                 <v-btn color="error" elevation="24" @click="cancelarEdit()"
                   >Cancel</v-btn
                 >
-                <v-btn color="warning" @click="editarFinal()" elevation="24"
+                <v-btn color="warning" :disabled="!validEdit" @click="editarFinal()" elevation="24"
                   >Edit</v-btn
                 >
               </v-card-actions>
@@ -376,8 +379,13 @@ export default {
         (v) => !!v || "The Breed Is Required",
         (v) => (v && v.length <= 20) || "Breed must be less than 20 characters",
       ],
+      ageRules: [
+        (v) => !!v || "The Age Is Required",
+        (v) => (v && v.length <= 2) || "Age must be less than 99 years",
+      ],
 
-      valid: true,
+      valid: false,
+      validEdit: false,
       snackbarNew: false,
       snackbarDelete: false,
       snackbarEdit: false,
@@ -554,6 +562,7 @@ export default {
       this.dialogCreatePet = true;
     },
     createPet() {
+       
       const params = new URLSearchParams([
         ["token", "7b64d09060db17ca6b96c0af99575903"],
       ]);
@@ -574,6 +583,7 @@ export default {
           this.reset();
           this.snackbarNew = true;
         });
+      
     },
     cancelar() {
       this.dialogCreatePet = false;
