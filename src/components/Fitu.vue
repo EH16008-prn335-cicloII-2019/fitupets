@@ -1,15 +1,7 @@
 <template>
   <v-app>
     <v-card>
-      <v-toolbar
-        app
-        class="line"
-        flat
-        shrink-on-scroll
-        scroll-target="#scrolling-techniques-2"
-        md="4"
-        cols="12"
-      >
+      <v-app-bar app class="line" flat md="4" cols="12">
         <v-spacer></v-spacer>
 
         <p class="title teal--text text--darken-4">Admin</p>
@@ -17,7 +9,7 @@
         <v-btn class="d-flex mt-8" color="teal accent-4" dark small
           >Fitu Pets</v-btn
         >
-      </v-toolbar>
+      </v-app-bar>
     </v-card>
 
     <v-navigation-drawer dark permanent app color="blue darken-3">
@@ -71,9 +63,9 @@
         <v-tab>All</v-tab>
       </v-tabs>
     </v-card>
-    <p class="title ml-14 mt-12 teal--text text--darken-4">Pets</p>
+    <p class="title ml-10 mt-6 teal--text text--darken-4">Pets</p>
 
-    <v-card class="mx-auto" width="100%" outlined>
+    <v-card class="mx-auto" width="96%" outlined>
       <v-data-table
         :headers="headers"
         :items="pets"
@@ -85,9 +77,11 @@
         <template v-slot:item.acciones="{ item }">
           <!--eslint-disable-->
           <v-icon small class="mr-2" @click="editItem(item)">
-            mdi-pencil
+            mdi-pencil-outline
           </v-icon>
-          <v-icon small @click="accionaEliminar(item)"> mdi-delete </v-icon>
+          <v-icon small @click="accionaEliminar(item)">
+            mdi-trash-can-outline
+          </v-icon>
         </template>
         <template v-slot:item.color="{ item }">
           <v-avatar :color="getColor(item.color)" dark size="15"> </v-avatar>
@@ -110,11 +104,7 @@
               </v-card-title>
 
               <v-card-text>
-                <v-form
-                  ref="form"
-                  v-model="valid"
-                 
-                >
+                <v-form ref="form" v-model="valid">
                   <v-text-field
                     append-icon="mdi-paw"
                     v-model="name"
@@ -132,7 +122,7 @@
                     hide-details
                     label="Type:"
                     single-line
-                    :rules="[v => !!v || 'Type is required']"
+                    :rules="[(v) => !!v || 'Type is required']"
                   ></v-select>
 
                   <v-text-field
@@ -162,11 +152,9 @@
                     label="Gender:"
                     single-line
                     required
-                    :rules="[v => !!v || 'Gender is required']"
+                    :rules="[(v) => !!v || 'Gender is required']"
                   ></v-select>
 
-
-                  
                   <div class="text-center">
                     <v-col>
                       <v-chip class="ma-2" color="success">
@@ -183,7 +171,6 @@
                       ></v-color-picker>
                     </v-col>
                   </div>
-                  
                 </v-form>
               </v-card-text>
               <v-divider></v-divider>
@@ -194,11 +181,14 @@
                 <v-btn
                   color="error"
                   elevation="24"
-                  
                   @click="dialogCreatePet = false"
                   >Cancel</v-btn
                 >
-                <v-btn color="success" :disabled="!valid" @click="createPet()" elevation="24"
+                <v-btn
+                  color="success"
+                  :disabled="!valid"
+                  @click="createPet()"
+                  elevation="24"
                   >Create</v-btn
                 >
               </v-card-actions>
@@ -216,11 +206,11 @@
             persistent
           >
             <v-card hover light max-height="500">
-              <v-card-title class="headline warning"> Edit a Pet </v-card-title>
+              <v-card-title class="headline indigo darken-4 white--text"> Edit a Pet </v-card-title>
 
               <v-card-text>
-                <v-form ref="form" v-model="validEdit" >
-                <v-text-field
+                <v-form ref="form" v-model="validEdit">
+                  <v-text-field
                     append-icon="mdi-paw"
                     v-model="name"
                     label="Name:"
@@ -237,7 +227,7 @@
                     hide-details
                     label="Type:"
                     single-line
-                    :rules="[v => !!v || 'Type is required']"
+                    :rules="[(v) => !!v || 'Type is required']"
                   ></v-select>
 
                   <v-text-field
@@ -255,7 +245,7 @@
                     required
                     type="number"
                     min="0"
-                    :rules="[v => !!v || 'Gender is required']"
+                    :rules="[(v) => !!v || 'Gender is required']"
                   ></v-text-field>
 
                   <v-select
@@ -267,11 +257,9 @@
                     label="Gender:"
                     single-line
                     required
-                    :rules="[v => !!v || 'Gender is required']"
+                    :rules="[(v) => !!v || 'Gender is required']"
                   ></v-select>
 
-
-                  
                   <div class="text-center">
                     <v-col>
                       <v-chip class="ma-2" color="success">
@@ -295,10 +283,15 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
 
-                <v-btn color="error" elevation="24" @click="cancelarEdit()"
+                <v-btn color="warning" elevation="24" dark @click="cancelarEdit()"
                   >Cancel</v-btn
                 >
-                <v-btn color="warning" :disabled="!validEdit" @click="editarFinal()" elevation="24"
+                <v-btn
+                  dark
+                  color="teal accent-4"
+                  :disabled="!validEdit"
+                  @click="editarFinal()"
+                  elevation="24"
                   >Edit</v-btn
                 >
               </v-card-actions>
@@ -307,14 +300,14 @@
         </v-row>
       </div>
       <v-dialog v-model="dialogDelete" max-width="500px">
-        <v-card color="red">
-          <v-card-title class="headline black--text"
+        <v-card color="indigo darken-4">
+          <v-card-title class="headline white--text"
             >Are you sure you want to delete this Pet?</v-card-title
           >
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="warning" @click="dialogDelete = false">Cancel</v-btn>
-            <v-btn color="blue" @click="deletePet()">Delete</v-btn>
+            <v-btn color="warning" dark @click="dialogDelete = false">Cancel</v-btn>
+            <v-btn color="teal accent-4" dark @click="deletePet()">Delete</v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
@@ -383,6 +376,7 @@ export default {
         (v) => !!v || "The Age Is Required",
         (v) => (v && v.length <= 2) || "Age must be less than 99 years",
       ],
+      date: new Date().toISOString().substr(0, 10),
 
       valid: false,
       validEdit: false,
@@ -401,6 +395,7 @@ export default {
       age: "",
       gender: "",
       color: "",
+      dateCreatedAt: "",
 
       kinds: ["cat", "dog", "hamster", "bird", "fish", "turtle", "rabbit"],
       genders: ["male", "female"],
@@ -473,9 +468,14 @@ export default {
       ],
     };
   },
+
   methods: {
     getColor(color) {
       return color;
+    },
+
+    getFecha(fecha) {
+      return fecha;
     },
     validate() {
       this.$refs.form.validate();
@@ -494,31 +494,29 @@ export default {
       axios
         .get("http://api-pets.fituapp.com/api/v1/pets", { params })
         .then((result) => {
-          console.log(result);
           this.getColor();
+          this.getFecha();
           this.pets = result.data;
-          console.log(result.data[0].color);
-          //result.data.forEach(element => {
-          //console.log(element.created_at);
-          //let arrayFecha= element.created_at.split(['-'])
-          //console.log(arrayFecha)
 
-          //var separarFecha_hora=arrayFecha[2]
-          //console.log(separarFecha_hora)
+          result.data.forEach((element) => {
+            console.log(element.created_at);
+
+            element.created_at =
+              new Date(element.created_at).toDateString() +
+              "," +
+              new Date(element.created_at)
+                .toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })
+                .toLowerCase();
+            console.log(typeof element.created_at);
+          });
+         
         });
-
-      // this.separarFecha_hora=this.separarFecha_hora.forEach(letras => {
-      // let arrayHoraPartida= this.separarFecha_hora.charAt(letras);
-      // console.log(arrayHoraPartida)
-      //  });
-      //.array.forEach(letras => {
-      //console.log(letras);
-
-      //arrayFecha[2].split(['-'])
-      //console.log(separarFecha_hora)
-      //element.created_at
-      //});
     },
+
     snackNewcerrada() {
       this.snackbarNew = false;
     },
@@ -536,9 +534,6 @@ export default {
     },
 
     deletePet() {
-      //console.log(item.id);
-
-      //this.dialogDelete=true;
       const params = new URLSearchParams([
         ["token", "7b64d09060db17ca6b96c0af99575903"],
       ]);
@@ -554,15 +549,12 @@ export default {
           console.log(result);
           this.dialogDelete = false;
           this.snackbarDelete = true;
-          //this.pets = result.data;
-          // console.log(result.data[0]);
         });
     },
     addPet() {
       this.dialogCreatePet = true;
     },
     createPet() {
-       
       const params = new URLSearchParams([
         ["token", "7b64d09060db17ca6b96c0af99575903"],
       ]);
@@ -583,7 +575,6 @@ export default {
           this.reset();
           this.snackbarNew = true;
         });
-      
     },
     cancelar() {
       this.dialogCreatePet = false;
@@ -591,10 +582,10 @@ export default {
     cancelarEdit() {
       this.dialogCreatePet = false;
       this.formAgregar = true;
+      
     },
     cancelarEliminar() {
       this.dialogDelete = false;
-      // this.yesornoDelete=false;
     },
     editItem(item) {
       this.formAgregar = false;
@@ -609,6 +600,7 @@ export default {
       this.itemEdit = item;
       console.log(this.itemEdit);
     },
+
     editarFinal() {
       console.log(this.itemEdit.id);
       this.itemEdit.name = this.name;
@@ -642,8 +634,8 @@ export default {
           this.formAgregar = true;
           this.cancelar();
           this.getPets();
-          //this.reset();
           this.snackbarEdit = true;
+          
           this.name = "";
           this.kind = "";
           this.breed = "";
@@ -655,24 +647,6 @@ export default {
   watch: {},
   created() {
     this.getPets();
-
-    //  let token='7b64d09060db17ca6b96c0af99575903'
-    //const res = axios.get(`http://api-pets.fituapp.com/api/v1/pets?${token}`, {
-    //headers: {
-    //authorization: '7b64d09060db17ca6b96c0af99575903',
-    // Content-Type: 'application/json',
-    //}
-    //})
-    //console.log(res)
-
-    // {
-    // headers: {
-    //authorization: '7b64d09060db17ca6b96c0af99575903',
-    // authorization: "Access-Control-Allow-Origin ",
-    // },
-    //}
-
-    // console.log(this.pets.data);
   },
 };
 </script>
