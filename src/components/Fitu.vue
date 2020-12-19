@@ -96,8 +96,6 @@
     </v-card>
 
     <v-main>
-
-
       <div class="text-center" v-if="formAgregar">
         <v-row justify="center">
           <v-dialog
@@ -112,18 +110,26 @@
               </v-card-title>
 
               <v-card-text>
-                <v-form ref="form" lazy-validation>
+                <v-form
+                  ref="form"
+                  v-model="valid"
+                  lazy-validation
+                  
+                >
                   <v-text-field
                     append-icon="mdi-paw"
                     v-model="name"
                     label="Name:"
                     required
+                    :rules="nameRules"
+                    :counter="10"
                   ></v-text-field>
                   <v-select
                     v-model="kind"
                     :items="kinds"
                     append-icon="mdi-paw"
                     menu-props="auto"
+                    required
                     hide-details
                     label="Type:"
                     single-line
@@ -134,6 +140,8 @@
                     v-model="breed"
                     label="Breed:"
                     required
+                    :rules="breedRules"
+                    :counter="20"
                   ></v-text-field>
                   <v-text-field
                     append-icon="mdi-calendar-check"
@@ -141,6 +149,7 @@
                     label="Age:"
                     required
                     type="number"
+                    min="0"
                   ></v-text-field>
 
                   <v-select
@@ -151,6 +160,7 @@
                     hide-details
                     label="Gender:"
                     single-line
+                    required
                   ></v-select>
 
                   <!--
@@ -167,7 +177,7 @@
                       <v-chip class="ma-2" color="success">
                         <v-icon left> mdi-palette</v-icon>
                         Pick a Color:
-                          </v-chip>
+                      </v-chip>
 
                       <v-color-picker
                         append-icon="mdi-palette"
@@ -212,12 +222,14 @@
               <v-card-title class="headline warning"> Edit a Pet </v-card-title>
 
               <v-card-text>
-                <v-form ref="form" lazy-validation>
+                <v-form ref="form" v-model="valid" lazy-validation>
                   <v-text-field
                     append-icon="mdi-paw"
                     v-model="name"
                     label="Name:"
                     required
+                    :rules="nameRules"
+                    :counter="10"
                   ></v-text-field>
                   <v-select
                     v-model="kind"
@@ -226,6 +238,7 @@
                     menu-props="auto"
                     hide-details
                     label="Type:"
+                    required
                     single-line
                   ></v-select>
 
@@ -234,6 +247,8 @@
                     v-model="breed"
                     label="Breed:"
                     required
+                    :rules="breedRules"
+                    :counter="20"
                   ></v-text-field>
                   <v-text-field
                     append-icon="mdi-calendar-check"
@@ -241,8 +256,8 @@
                     label="Age:"
                     required
                     type="number"
+                    min="0"
                   ></v-text-field>
-
                   <v-select
                     v-model="gender"
                     :items="genders"
@@ -251,15 +266,15 @@
                     hide-details
                     label="Gender:"
                     single-line
+                    required
                   ></v-select>
 
-
-                      <div class="text-center">
+                  <div class="text-center">
                     <v-col>
                       <v-chip class="ma-2" color="success">
                         <v-icon left> mdi-palette</v-icon>
                         Pick a Color:
-                          </v-chip>
+                      </v-chip>
 
                       <v-color-picker
                         append-icon="mdi-palette"
@@ -270,7 +285,6 @@
                       ></v-color-picker>
                     </v-col>
                   </div>
-
                 </v-form>
               </v-card-text>
               <v-divider></v-divider>
@@ -289,19 +303,61 @@
           </v-dialog>
         </v-row>
       </div>
-            <v-dialog v-model="dialogDelete" max-width="500px">
-        <v-card color="orange darken-4">
+      <v-dialog v-model="dialogDelete" max-width="500px">
+        <v-card color="red">
           <v-card-title class="headline black--text"
             >Are you sure you want to delete this Pet?</v-card-title
           >
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="warning" @click="dialogDelete=false">Cancel</v-btn>
-            <v-btn color="error" @click="deletePet()">Delete</v-btn>
+            <v-btn color="warning" @click="dialogDelete = false">Cancel</v-btn>
+            <v-btn color="blue" @click="deletePet()">Delete</v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <div class="text-center ma-2">
+        <v-snackbar v-model="snackbarNew" color="success">
+          {{ textSnackNew }}
+          <v-btn class="ml-16" color="error" text @click="snackNewcerrada">
+            <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z"
+              />
+            </svg>
+          </v-btn>
+        </v-snackbar>
+      </div>
+
+      <div class="text-center ma-2">
+        <v-snackbar v-model="snackbarDelete" color="error">
+          {{ textSnackDelete }}
+          <v-btn class="ml-16" color="success" text @click="snackDeletecerrada">
+            <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z"
+              />
+            </svg>
+          </v-btn>
+        </v-snackbar>
+      </div>
+
+      <div class="text-center ma-2">
+        <v-snackbar v-model="snackbarEdit" color="warning">
+          {{ textSnackEdit }}
+          <v-btn class="ml-16" color="error" text @click="snackEditcerrada">
+            <svg style="width: 24px; height: 24px" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z"
+              />
+            </svg>
+          </v-btn>
+        </v-snackbar>
+      </div>
     </v-main>
   </v-app>
 </template>
@@ -312,6 +368,22 @@ export default {
   name: "Fitu",
   data() {
     return {
+      nameRules: [
+        (v) => !!v || "The Name Is Required",
+        (v) => (v && v.length <= 10) || "Name must be less than 10 characters",
+      ],
+      breedRules: [
+        (v) => !!v || "The Breed Is Required",
+        (v) => (v && v.length <= 20) || "Breed must be less than 20 characters",
+      ],
+
+      valid: true,
+      snackbarNew: false,
+      snackbarDelete: false,
+      snackbarEdit: false,
+      textSnackNew: "Pet Created!!! Thanks ",
+      textSnackDelete: "Pet Deleted!!! Thanks ",
+      textSnackEdit: "Pet Edited!!! Thanks ",
       itemEdit: "",
       itemEliminar: "",
       formAgregar: true,
@@ -397,6 +469,16 @@ export default {
     getColor(color) {
       return color;
     },
+    validate() {
+      this.$refs.form.validate();
+    },
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
+    },
+
     getPets() {
       const params = new URLSearchParams([
         ["token", "7b64d09060db17ca6b96c0af99575903"],
@@ -429,31 +511,41 @@ export default {
       //element.created_at
       //});
     },
-
-    accionaEliminar(item){
-        this.itemEliminar=item.id;
-        console.log(this.itemEliminar);
-        this.dialogDelete=true;
-
+    snackNewcerrada() {
+      this.snackbarNew = false;
+    },
+    snackDeletecerrada() {
+      this.snackbarDelete = false;
+    },
+    snackEditcerrada() {
+      this.snackbarEdit = false;
     },
 
-      deletePet() {
+    accionaEliminar(item) {
+      this.itemEliminar = item.id;
+      console.log(this.itemEliminar);
+      this.dialogDelete = true;
+    },
+
+    deletePet() {
       //console.log(item.id);
 
-      
-      
       //this.dialogDelete=true;
       const params = new URLSearchParams([
         ["token", "7b64d09060db17ca6b96c0af99575903"],
       ]);
       axios
-        .delete(`http://api-pets.fituapp.com/api/v1/pets/${this.itemEliminar}`, {
-          params,
-        })
+        .delete(
+          `http://api-pets.fituapp.com/api/v1/pets/${this.itemEliminar}`,
+          {
+            params,
+          }
+        )
         .then((result) => {
           this.getPets();
           console.log(result);
-          this.dialogDelete=false;
+          this.dialogDelete = false;
+          this.snackbarDelete = true;
           //this.pets = result.data;
           // console.log(result.data[0]);
         });
@@ -479,6 +571,8 @@ export default {
           console.log(result);
           this.cancelar();
           this.getPets();
+          this.reset();
+          this.snackbarNew = true;
         });
     },
     cancelar() {
@@ -538,6 +632,13 @@ export default {
           this.formAgregar = true;
           this.cancelar();
           this.getPets();
+          //this.reset();
+          this.snackbarEdit = true;
+          this.name = "";
+          this.kind = "";
+          this.breed = "";
+          this.age = "";
+          this.gender = "";
         });
     },
   },
